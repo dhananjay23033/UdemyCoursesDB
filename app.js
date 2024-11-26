@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const pg = require('pg');
 require('dotenv').config();
+const cors = require('cors');
 
 // Database configuration
 const config = {
@@ -43,6 +44,8 @@ e6H9HVHswLFqOzvyCL14ShffwmPOsV5yKj+XfdsqVFGEBARI8Q==
 // Initialize Express
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 // Database connection test
 app.get('/test-db', async (req, res) => {
