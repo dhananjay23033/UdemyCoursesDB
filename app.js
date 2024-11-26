@@ -76,6 +76,20 @@ app.get('/count-courses', async (req, res) => {
   }
 });
 
+app.get('/all-courses', async (req, res) => {
+  const client = new pg.Client(config);
+  try {
+      await client.connect();
+      const result = await client.query('SELECT * FROM Courses');
+      res.json({ courses: result.rows });
+  } catch (error) {
+      console.error('Database query error:', error);
+      res.status(500).json({ error: 'Failed to query the database' });
+  } finally {
+      await client.end();
+  }
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
