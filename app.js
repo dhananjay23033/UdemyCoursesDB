@@ -73,9 +73,10 @@ app.get('/count-courses', async (req, res) => {
       res.status(500).json({ error: 'Failed to query the database' });
   } finally {
       await client.end();
-  }
+    }
 });
 
+// API endpoint to list all courses
 app.get('/all-courses', async (req, res) => {
   const client = new pg.Client(config);
   try {
@@ -88,6 +89,30 @@ app.get('/all-courses', async (req, res) => {
   } finally {
       await client.end();
   }
+});
+
+// API endpoint to search for courses by title
+app.get('/search', async (req, res) => {
+    const courseName = req.query.courseName;
+    if (!courseName || courseName.length > 50) {
+        return res.status(400).send({ error: 'Invalid course name' });
+    }
+
+    const client = new pg.Client(config);
+    try {
+        await client.connect();
+        // Use parameterized queries to avoid SQL injection
+        const query = `SELECT * FROM Courses WHERE title ILIKE $1`;
+        const values = [`%${courseName}%`];
+        const result = await client.query(query, values);
+
+        res.send(result.rows);
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).send({ error: 'Error fetching data' });
+    } finally {
+        await client.end();
+    }
 });
 
 // Start the server
